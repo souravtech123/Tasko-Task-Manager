@@ -69,9 +69,9 @@ export default function Home() {
   };
   
   /* ================= TASK ================= */
-  const createTask = (status) => {
+  const createTask = () => {
     if (!taskTitle.trim() || !activeProject) return;
-
+  
     updateActiveProject((project) => ({
       ...project,
       tasks: [
@@ -79,13 +79,14 @@ export default function Home() {
         {
           id: Date.now(),
           title: taskTitle,
-          status,
+          status: "Todo", // ✅ default status
         },
       ],
     }));
-
+  
     setTaskTitle("");
   };
+  
 
   const changeTaskStatus = (taskId, status) => {
     updateActiveProject((project) => ({
@@ -204,13 +205,21 @@ export default function Home() {
 
               {/* ADD TASK */}
               <div className="flex gap-2 mb-6 max-w-md">
-                <input
-                  placeholder="What needs to be done?"
-                  value={taskTitle}
-                  onChange={(e) => setTaskTitle(e.target.value)}
-                  className="flex-1 border px-3 py-2 rounded"
-                />
-              </div>
+  <input
+    placeholder="What needs to be done?"
+    value={taskTitle}
+    onChange={(e) => setTaskTitle(e.target.value)}
+    className="flex-1 border px-3 py-2 rounded"
+  />
+  <button
+    onClick={createTask}
+    disabled={!taskTitle.trim()}
+    className="bg-indigo-600 text-white px-4 rounded disabled:opacity-40"
+  >
+    Add Task
+  </button>
+</div>
+
 
               {/* KANBAN BOARD */}
               <div className="grid grid-cols-3 gap-4">
