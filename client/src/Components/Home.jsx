@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 
 const ROLES = ["Frontend", "Backend", "AI", "Design", "Lead"];
-const STATUSES = ["Planning", "Building", "Review", "Done"];
 
 export default function ProjectSystem() {
   const [projects, setProjects] = useState(() => {
@@ -12,13 +11,22 @@ export default function ProjectSystem() {
   const [activeId, setActiveId] = useState(null);
 
   const [projectName, setProjectName] = useState("");
+  const [editingName, setEditingName] = useState(false);
+
   const [memberName, setMemberName] = useState("");
   const [memberRole, setMemberRole] = useState(ROLES[0]);
-  const [milestone, setMilestone] = useState("");
+
+  const [taskTitle, setTaskTitle] = useState("");
+  const [assigneeId, setAssigneeId] = useState("");
+
+  const [goalTitle, setGoalTitle] = useState("");
 
   useEffect(() => {
     localStorage.setItem("tasko-pms", JSON.stringify(projects));
-  }, [projects]);
+    if (projects.length && !projects.find(p => p.id === activeId)) {
+      setActiveId(projects[0].id);
+    }
+  }, [projects, activeId]);
 
   const activeProject = projects.find(p => p.id === activeId);
 
@@ -26,108 +34,152 @@ export default function ProjectSystem() {
   const createProject = () => {
     if (!projectName.trim()) return;
 
-    setProjects([
-      ...projects,
-      {
-        id: Date.now(),
-        name: projectName,
-        team: [],
-        milestones: [],
-      },
-    ]);
+    const p = {
+      id: Date.now(),
+      name: projectName,
+      team: [],
+      tasks: [],
+      goals: [],
+    };
 
+    setProjects(prev => [...prev, p]);
+    setActiveId(p.id);
     setProjectName("");
+  };
+
+  const updateProjectName = () => {
+    setProjects(prev =>
+      prev.map(p =>
+        p.id === activeId ? { ...p, name: projectName } : p
+      )
+    );
+    setEditingName(false);
   };
 
   /* ---------- TEAM ---------- */
   const addMember = () => {
     if (!memberName.trim()) return;
 
-    setProjects(projects.map(p =>
-      p.id === activeId
-        ? {
-            ...p,
-            team: [...p.team, { id: Date.now(), name: memberName, role: memberRole }],
-          }
-        : p
-    ));
-
+    setProjects(prev =>
+      prev.map(p =>
+        p.id === activeId
+          ? {
+              ...p,
+              team: [...p.team, { id: Date.now(), name: memberName, role: memberRole }],
+            }
+          : p
+      )
+    );
     setMemberName("");
   };
 
-  const removeMember = (id) => {
-    setProjects(projects.map(p =>
-      p.id === activeId
-        ? { ...p, team: p.team.filter(m => m.id !== id) }
-        : p
-    ));
+  /* ---------- TASK ---------- */
+  const addTask = () => {
+    if (!taskTitle.trim() || !assigneeId) return;
+
+    setProjects(prev =>
+      prev.map(p =>
+        p.id === activeId
+          ? {
+              ...p,
+              tasks: [
+                ...p.tasks,
+                { id: Date.now(), title: taskTitle, assigneeId, done: false },
+              ],
+            }
+          : p
+      )
+    );
+    setTaskTitle("");
   };
 
-  /* ---------- MILESTONE ---------- */
-  const addMilestone = () => {
-    if (!milestone.trim()) return;
-
-    setProjects(projects.map(p =>
-      p.id === activeId
-        ? {
-            ...p,
-            milestones: [
-              ...p.milestones,
-              { id: Date.now(), title: milestone, status: STATUSES[0] },
-            ],
-          }
-        : p
-    ));
-
-    setMilestone("");
+  const toggleTask = (id) => {
+    setProjects(prev =>
+      prev.map(p =>
+        p.id === activeId
+          ? {
+              ...p,
+              tasks: p.tasks.map(t =>
+                t.id === id ? { ...t, done: !t.done } : t
+              ),
+            }
+          : p
+      )
+    );
   };
 
-  const removeMilestone = (id) => {
-    setProjects(projects.map(p =>
-      p.id === activeId
-        ? { ...p, milestones: p.milestones.filter(m => m.id !== id) }
-        : p
-    ));
+  /* ---------- GOALS ---------- */
+  const addGoal = () => {
+    if (!goalTitle.trim()) return;
+
+    setProjects(prev =>
+      prev.map(p =>
+        p.id === activeId
+          ? {
+              ...p,
+              goals: [...p.goals, { id: Date.now(), title: goalTitle, done: false }],
+            }
+          : p
+      )
+    );
+    setGoalTitle("");
+  };
+
+  const toggleGoal = (id) => {
+    setProjects(prev =>
+      prev.map(p =>
+        p.id === activeId
+          ? {
+              ...p,
+              goals: p.goals.map(g =>
+                g.id === id ? { ...g, done: !g.done } : g
+              ),
+            }
+          : p
+      )
+    );
+  };
+
+  /* ---------- ANALYTICS ---------- */
+  const memberStats = (memberId) => {
+    const tasks = activeProject.tasks.filter(t => t.assigneeId === memberId);
+    const done = tasks.filter(t => t.done).length;
+    return {
+      total: tasks.length,
+      done,
+      percent: tasks.length ? Math.round((done / tasks.length) * 100) : 0,
+    };
   };
 
   return (
-    <section className="min-h-screen bg-[#07070d] text-white px-5 py-10">
-      <div className="max-w-5xl mx-auto">
-
-        {/* HEADER */}
-        <header className="mb-10">
-          <h1 className="text-3xl font-semibold">Tasko Projects</h1>
-          <p className="text-white/40 mt-1">
-            Simple project management for developers
-          </p>
-        </header>
+    <section
+    id="project-system"
+    className="min-h-screen bg-[#07070d] text-white px-5 py-10"
+  >
+  
+      <div className="max-w-6xl mx-auto space-y-14">
 
         {/* CREATE PROJECT */}
-        <div className="flex gap-3 mb-12">
+        <div className="flex gap-3">
           <input
-            className="flex-1 bg-white/5 px-4 py-3 rounded-lg outline-none"
+            className="flex-1 bg-white/5 px-4 py-3 rounded-lg"
             placeholder="Project name"
             value={projectName}
             onChange={e => setProjectName(e.target.value)}
           />
-          <button
-            onClick={createProject}
-            className="px-6 py-3 rounded-lg bg-white text-black font-medium"
-          >
+          <button onClick={createProject} className="bg-white text-black px-6 rounded-lg">
             Create
           </button>
         </div>
 
         {/* PROJECT LIST */}
-        <div className="space-y-3 mb-12">
+        <div className="flex gap-3 flex-wrap">
           {projects.map(p => (
             <button
               key={p.id}
               onClick={() => setActiveId(p.id)}
-              className={`w-full text-left px-5 py-4 rounded-lg transition ${
-                activeId === p.id
-                  ? "bg-white text-black"
-                  : "bg-white/5 hover:bg-white/10"
+              className={`px-4 py-2 rounded-lg ${
+                activeId === p.id ? "bg-white text-black" : "bg-white/10"
               }`}
             >
               {p.name}
@@ -135,111 +187,124 @@ export default function ProjectSystem() {
           ))}
         </div>
 
-        {/* EMPTY STATE */}
-        {!activeProject && projects.length > 0 && (
-          <p className="text-white/40">
-            Select a project to manage it 👆
-          </p>
-        )}
-
-        {/* PROJECT DETAILS */}
         {activeProject && (
-          <div className="space-y-14">
-
-            {/* PROJECT TITLE */}
+          <>
+            {/* PROJECT TITLE EDIT */}
             <div>
-              <h2 className="text-2xl font-semibold">{activeProject.name}</h2>
-              <p className="text-white/40 text-sm">
-                Manage team & milestones
-              </p>
+              {editingName ? (
+                <div className="flex gap-3">
+                  <input
+                    className="bg-white/10 px-3 py-2 rounded-lg"
+                    value={projectName}
+                    onChange={e => setProjectName(e.target.value)}
+                  />
+                  <button onClick={updateProjectName}>Save</button>
+                </div>
+              ) : (
+                <h2
+                  className="text-2xl font-semibold cursor-pointer"
+                  onClick={() => {
+                    setProjectName(activeProject.name);
+                    setEditingName(true);
+                  }}
+                >
+                  {activeProject.name} ✏️
+                </h2>
+              )}
             </div>
 
             {/* TEAM */}
             <section>
-              <h3 className="text-lg font-medium mb-3">Team</h3>
-
-              <div className="flex flex-wrap gap-3 mb-4">
-                {activeProject.team.map(m => (
-                  <div
-                    key={m.id}
-                    className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-sm"
-                  >
-                    <span>{m.name} · {m.role}</span>
-                    <button
-                      onClick={() => removeMember(m.id)}
-                      className="text-red-400"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+              <h3 className="text-lg mb-3">Team</h3>
+              <div className="flex gap-3 mb-3 flex-wrap">
+                {activeProject.team.map(m => {
+                  const s = memberStats(m.id);
+                  return (
+                    <div key={m.id} className="bg-white/10 p-3 rounded-lg text-sm">
+                      <p>{m.name} · {m.role}</p>
+                      <p className="text-white/40">
+                        Tasks: {s.done}/{s.total} ({s.percent}%)
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex gap-3">
                 <input
-                  className="bg-white/5 px-3 py-2 rounded-lg text-sm"
+                  className="bg-white/5 px-3 py-2 rounded-lg"
                   placeholder="Member name"
                   value={memberName}
                   onChange={e => setMemberName(e.target.value)}
                 />
                 <select
-                  className="bg-white/5 px-3 py-2 rounded-lg text-sm"
+                  className="bg-white/5 px-3 py-2 rounded-lg"
                   value={memberRole}
                   onChange={e => setMemberRole(e.target.value)}
                 >
-                  {ROLES.map(r => (
-                    <option key={r}>{r}</option>
+                  {ROLES.map(r => <option key={r}>{r}</option>)}
+                </select>
+                <button onClick={addMember}>Add</button>
+              </div>
+            </section>
+
+            {/* TASKS */}
+            <section>
+              <h3 className="text-lg mb-3">Tasks</h3>
+              {activeProject.tasks.map(t => (
+                <label key={t.id} className="flex gap-3 items-center mb-2">
+                  <input type="checkbox" checked={t.done} onChange={() => toggleTask(t.id)} />
+                  <span className={t.done ? "line-through text-white/40" : ""}>
+                    {t.title}
+                  </span>
+                </label>
+              ))}
+
+              <div className="flex gap-3 mt-3">
+                <input
+                  className="bg-white/5 px-3 py-2 rounded-lg"
+                  placeholder="Task"
+                  value={taskTitle}
+                  onChange={e => setTaskTitle(e.target.value)}
+                />
+                <select
+                  className="bg-white/5 px-3 py-2 rounded-lg"
+                  value={assigneeId}
+                  onChange={e => setAssigneeId(e.target.value)}
+                >
+                  <option value="">Assign to</option>
+                  {activeProject.team.map(m => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
                   ))}
                 </select>
-                <button
-                  onClick={addMember}
-                  className="px-4 py-2 rounded-lg bg-white text-black text-sm"
-                >
-                  Add
-                </button>
+                <button onClick={addTask}>Add</button>
               </div>
             </section>
 
-            {/* MILESTONES */}
+            {/* GOALS */}
             <section>
-              <h3 className="text-lg font-medium mb-3">Milestones</h3>
+              <h3 className="text-lg mb-3">Final Goals</h3>
+              {activeProject.goals.map(g => (
+                <label key={g.id} className="flex gap-3 items-center mb-2">
+                  <input type="checkbox" checked={g.done} onChange={() => toggleGoal(g.id)} />
+                  <span className={g.done ? "line-through text-white/40" : ""}>
+                    {g.title}
+                  </span>
+                </label>
+              ))}
 
-              <div className="space-y-3 mb-4">
-                {activeProject.milestones.map(m => (
-                  <div
-                    key={m.id}
-                    className="flex justify-between items-center bg-white/5 px-4 py-3 rounded-lg"
-                  >
-                    <span>{m.title}</span>
-                    <button
-                      onClick={() => removeMilestone(m.id)}
-                      className="text-xs text-red-400"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex gap-3">
+              <div className="flex gap-3 mt-3">
                 <input
-                  className="bg-white/5 px-3 py-2 rounded-lg text-sm flex-1"
-                  placeholder="New milestone"
-                  value={milestone}
-                  onChange={e => setMilestone(e.target.value)}
+                  className="bg-white/5 px-3 py-2 rounded-lg"
+                  placeholder="Goal"
+                  value={goalTitle}
+                  onChange={e => setGoalTitle(e.target.value)}
                 />
-                <button
-                  onClick={addMilestone}
-                  className="px-4 py-2 rounded-lg bg-white text-black text-sm"
-                >
-                  Add
-                </button>
+                <button onClick={addGoal}>Add</button>
               </div>
             </section>
-
-          </div>
+          </>
         )}
-
       </div>
     </section>
   );

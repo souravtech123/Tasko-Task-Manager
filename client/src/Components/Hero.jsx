@@ -1,4 +1,12 @@
 export default function Hero() {
+
+  const scrollToProjectSystem = () => {
+    const target = document.getElementById("project-system");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-[#05050b] text-white">
       
@@ -15,12 +23,10 @@ export default function Hero() {
         {/* LEFT TEXT */}
         <div className="flex-1 text-center lg:text-left">
           
-          {/* BADGE */}
           <p className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full border border-white/15 text-sm text-white/70">
             ⚙️ Built for Development Teams
           </p>
 
-          {/* HEADLINE */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight">
             Ship projects faster. <br />
             <span className="text-white/70">
@@ -28,7 +34,6 @@ export default function Hero() {
             </span>
           </h1>
 
-          {/* SUBTEXT */}
           <p className="mt-6 max-w-xl text-base sm:text-lg text-white/60 mx-auto lg:mx-0">
             Tasko helps developers plan sprints, track tasks, and deliver
             real-world software projects with clarity, structure, and flow.
@@ -36,7 +41,10 @@ export default function Hero() {
 
           {/* CTA */}
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <button className="px-8 py-4 rounded-xl bg-white text-black font-medium hover:bg-white/90 transition">
+            <button
+              onClick={scrollToProjectSystem}
+              className="px-8 py-4 rounded-xl bg-white text-black font-medium hover:bg-white/90 transition"
+            >
               Start a dev project
             </button>
 
@@ -45,7 +53,6 @@ export default function Hero() {
             </button>
           </div>
 
-          {/* TRUST LINE */}
           <p className="mt-6 text-xs text-white/40">
             Designed for web, app & software development teams
           </p>
@@ -55,7 +62,6 @@ export default function Hero() {
         <div className="flex-1 relative w-full max-w-md lg:max-w-lg">
           <div className="relative rounded-[28px] border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-2xl">
             
-            {/* TOP BAR */}
             <div className="flex items-center justify-between mb-6">
               <span className="text-sm text-white/70">
                 Tasko · Sprint Board
@@ -65,7 +71,6 @@ export default function Hero() {
               </span>
             </div>
 
-            {/* FAKE DEV TASKS */}
             <div className="space-y-4">
               <div className="h-10 rounded-xl bg-gradient-to-r from-indigo-500/40 to-purple-500/40" />
               <div className="h-10 rounded-xl bg-white/10" />
@@ -74,7 +79,6 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* FLOATING GLOWS */}
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/30 rounded-full blur-[80px]" />
           <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-500/30 rounded-full blur-[80px]" />
         </div>
