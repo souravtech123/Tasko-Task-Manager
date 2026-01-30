@@ -1,279 +1,260 @@
+import { useState, useEffect } from "react";
 
-import { useEffect, useState } from "react";
+const ROLES = ["Frontend", "Backend", "AI", "Design", "Lead"];
+const STATUSES = ["Planning", "Building", "Review", "Done"];
 
-const STATUSES = ["Todo", "In Progress", "Done"];
-
-export default function Home() {
-  /* ================= STATE ================= */
+export default function ProjectSystem() {
   const [projects, setProjects] = useState(() => {
-    const saved = localStorage.getItem("tasko-projects");
+    const saved = localStorage.getItem("tasko-pms");
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [activeProjectId, setActiveProjectId] = useState(null);
-  const [projectName, setProjectName] = useState("");
-  const [taskTitle, setTaskTitle] = useState("");
+  const [active, setActive] = useState(null);
+  const [name, setName] = useState("");
+  const [stack, setStack] = useState("");
+  const [member, setMember] = useState("");
+  const [role, setRole] = useState(ROLES[0]);
+  const [milestone, setMilestone] = useState("");
 
-  const activeProject = projects.find(
-    (p) => p.id === activeProjectId
-  );
-
-  /* ================= STORAGE ================= */
   useEffect(() => {
-    localStorage.setItem(
-      "tasko-projects",
-      JSON.stringify(projects)
-    );
+    localStorage.setItem("tasko-pms", JSON.stringify(projects));
   }, [projects]);
 
-  /* ================= HELPERS ================= */
-  const updateActiveProject = (callback) => {
-    setProjects((prev) =>
-      prev.map((project) =>
-        project.id === activeProjectId
-          ? callback(project)
-          : project
-      )
-    );
-  };
-
-  /* ================= PROJECT ================= */
   const createProject = () => {
-    if (!projectName.trim()) return;
-  
-    const newProject = {
-      id: Date.now(),
-      name: projectName,
-      tasks: [],
-    };
-  
-    setProjects((prev) => [...prev, newProject]);
-  
-    // ✅ AUTO-SELECT NEW PROJECT
-    setActiveProjectId(newProject.id);
-  
-    setProjectName("");
+    if (!name.trim()) return;
+    setProjects(p => [
+      ...p,
+      {
+        id: Date.now(),
+        name,
+        stack,
+        team: [],
+        milestones: [],
+      },
+    ]);
+    setName("");
+    setStack("");
   };
 
-  
+  const deleteProject = (id) => {
+    setProjects(p => p.filter(pr => pr.id !== id));
+    if (active === id) setActive(null);
+  };
 
-  const deleteProject = (projectId) => {
-    setProjects((prev) =>
-      prev.filter((project) => project.id !== projectId)
+  const updateProject = (cb) => {
+    setProjects(p =>
+      p.map(pr => (pr.id === active ? cb(pr) : pr))
     );
-  
-    // If active project is deleted → reset view
-    if (projectId === activeProjectId) {
-      setActiveProjectId(null);
-    }
   };
-  
-  /* ================= TASK ================= */
-  const createTask = () => {
-    if (!taskTitle.trim() || !activeProject) return;
-  
-    updateActiveProject((project) => ({
-      ...project,
-      tasks: [
-        ...project.tasks,
-        {
-          id: Date.now(),
-          title: taskTitle,
-          status: "Todo", // ✅ default status
-        },
+
+  const addMember = () => {
+    if (!member.trim()) return;
+    updateProject(pr => ({
+      ...pr,
+      team: [...pr.team, { id: Date.now(), name: member, role }],
+    }));
+    setMember("");
+  };
+
+  const removeMember = (id) => {
+    updateProject(pr => ({
+      ...pr,
+      team: pr.team.filter(m => m.id !== id),
+    }));
+  };
+
+  const addMilestone = () => {
+    if (!milestone.trim()) return;
+    updateProject(pr => ({
+      ...pr,
+      milestones: [
+        ...pr.milestones,
+        { id: Date.now(), title: milestone, status: STATUSES[0] },
       ],
     }));
-  
-    setTaskTitle("");
+    setMilestone("");
   };
-  
 
-  const changeTaskStatus = (taskId, status) => {
-    updateActiveProject((project) => ({
-      ...project,
-      tasks: project.tasks.map((task) =>
-        task.id === taskId ? { ...task, status } : task
-      ),
+  const removeMilestone = (id) => {
+    updateProject(pr => ({
+      ...pr,
+      milestones: pr.milestones.filter(m => m.id !== id),
     }));
   };
 
-  /* ================= PROGRESS ================= */
-  const progress = activeProject
-    ? activeProject.tasks.length === 0
-      ? 0
-      : Math.round(
-          (activeProject.tasks.filter(
-            (t) => t.status === "Done"
-          ).length /
-            activeProject.tasks.length) *
-            100
-        )
-    : 0;
+  const activeProject = projects.find(p => p.id === active);
 
-  /* ================= UI ================= */
   return (
-    <div className="min-h-screen bg-slate-100">
-      {/* HEADER */}
-      <header className="bg-white border-b px-6 py-4">
-        <h1 className="text-xl font-bold">
-          🚀 Tasko – Student Project Manager
-        </h1>
-      </header>
+    <section className="min-h-screen bg-[#07070d] text-white">
+      <div className="max-w-7xl mx-auto px-6 py-16">
 
-      <div className="flex h-[calc(100vh-72px)]">
-        {/* SIDEBAR */}
-        <aside className="w-64 bg-white border-r p-4">
-          <h2 className="font-semibold mb-4">📂 Projects</h2>
+        {/* HEADER */}
+        <header className="mb-16">
+          <h1 className="text-3xl font-semibold">Projects</h1>
+          <p className="text-white/40 mt-2">
+            Minimal project management for focused teams
+          </p>
+        </header>
 
-          <div className="flex gap-2 mb-4">
-            <input
-              placeholder="Project name..."
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
-              className="flex-1 border px-2 py-1 rounded text-sm"
-            />
-            <button
-              onClick={createProject}
-              className="bg-indigo-600 text-white px-3 rounded text-sm"
-            >
-              Add
-            </button>
-          </div>
+        {/* CREATE PROJECT */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-20">
+          <input
+            className="bg-white/5 px-4 py-3 rounded-lg outline-none focus:ring-1 focus:ring-white/30"
+            placeholder="Project name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+          />
+          <input
+            className="bg-white/5 px-4 py-3 rounded-lg outline-none focus:ring-1 focus:ring-white/30"
+            placeholder="Tech stack"
+            value={stack}
+            onChange={e => setStack(e.target.value)}
+          />
+          <button
+            onClick={createProject}
+            className="bg-white text-black rounded-lg py-3 font-medium hover:bg-white/90 transition"
+          >
+            Create Project
+          </button>
+        </div>
 
-          {projects.length === 0 && (
-            <p className="text-sm text-gray-400">
-              No projects yet 😴
-            </p>
-          )}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
 
-{projects.map((project) => (
-  <div
-    key={project.id}
-    className={`flex items-center justify-between p-2 rounded mb-1 text-sm ${
-      project.id === activeProjectId
-        ? "bg-indigo-100 text-indigo-700"
-        : "hover:bg-gray-100"
-    }`}
-  >
-    {/* Project Name */}
-    <span
-      onClick={() => setActiveProjectId(project.id)}
-      className="cursor-pointer flex-1"
-    >
-      {project.name}
-    </span>
-
-    {/* Delete Button */}
-    <button
-      onClick={() => deleteProject(project.id)}
-      className="text-red-500 hover:text-red-700 text-xs ml-2"
-      title="Delete Project"
-    >
-      ✕
-    </button>
-  </div>
-))}
-</aside>  
-
-
-        {/* MAIN */}
-        <main className="flex-1 p-6 overflow-x-auto">
-          {!activeProject ? (
-            <div className="text-black text-center mt-20 text-xl font-bold">
-               Select a project to begin
-            </div>
-          ) : (
-            <>
-              {/* PROJECT HEADER */}
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold">
-                  {activeProject.name}
-                </h2>
-
-                <div className="mt-3">
-                  <p className="text-sm mb-1">
-                    Progress: {progress}%
+          {/* PROJECT LIST */}
+          <aside className="lg:col-span-4 space-y-4">
+            {projects.map(p => (
+              <div
+                key={p.id}
+                className={`p-5 rounded-xl border transition cursor-pointer ${
+                  active === p.id
+                    ? "border-white/30 bg-white/10"
+                    : "border-white/10 bg-white/5 hover:bg-white/10"
+                }`}
+              >
+                <div onClick={() => setActive(p.id)}>
+                  <h3 className="text-lg font-medium">{p.name}</h3>
+                  <p className="text-sm text-white/40">
+                    {p.stack || "No stack"}
                   </p>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-indigo-600 h-2 rounded-full"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
                 </div>
+
+                <button
+                  onClick={() => deleteProject(p.id)}
+                  className="mt-4 text-xs text-red-400 hover:text-red-300"
+                >
+                  Delete Project
+                </button>
               </div>
+            ))}
+          </aside>
 
-              {/* ADD TASK */}
-              <div className="flex gap-2 mb-6 max-w-md">
-  <input
-    placeholder="What needs to be done?"
-    value={taskTitle}
-    onChange={(e) => setTaskTitle(e.target.value)}
-    className="flex-1 border px-3 py-2 rounded"
-  />
-  <button
-    onClick={createTask}
-    disabled={!taskTitle.trim()}
-    className="bg-indigo-600 text-white px-4 rounded disabled:opacity-40"
-  >
-    Add Task
-  </button>
-</div>
+          {/* WORKSPACE */}
+          <main className="lg:col-span-8">
+            {!activeProject ? (
+              <p className="text-white/40 text-lg">
+                Select a project to start working
+              </p>
+            ) : (
+              <div className="space-y-14">
 
+                {/* TITLE */}
+                <section>
+                  <h2 className="text-2xl font-semibold">
+                    {activeProject.name}
+                  </h2>
+                  <p className="text-white/40 mt-1">
+                    {activeProject.stack}
+                  </p>
+                </section>
 
-              {/* KANBAN BOARD */}
-              <div className="grid grid-cols-3 gap-4">
-                {STATUSES.map((status) => (
-                  <div
-                    key={status}
-                    className="bg-white rounded-xl shadow-sm p-3"
-                  >
-                    <h3 className="font-semibold mb-3">
-                      {status}
-                    </h3>
+                {/* TEAM */}
+                <section>
+                  <p className="text-sm text-white/40 mb-4">Team</p>
 
-                    <button
-                      onClick={() => createTask(status)}
-                      disabled={!taskTitle}
-                      className="text-sm text-indigo-600 mb-3 disabled:opacity-40"
-                    >
-                      + Add task
-                    </button>
-
-                    {activeProject.tasks
-                      .filter((task) => task.status === status)
-                      .map((task) => (
-                        <div
-                          key={task.id}
-                          className="border rounded-lg p-3 mb-2 bg-slate-50"
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    {activeProject.team.map(m => (
+                      <div
+                        key={m.id}
+                        className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-sm"
+                      >
+                        <span>{m.name} · {m.role}</span>
+                        <button
+                          onClick={() => removeMember(m.id)}
+                          className="text-red-400 hover:text-red-300"
                         >
-                          <p className="text-sm font-medium mb-2">
-                            {task.title}
-                          </p>
-
-                          <select
-                            value={task.status}
-                            onChange={(e) =>
-                              changeTaskStatus(
-                                task.id,
-                                e.target.value
-                              )
-                            }
-                            className="text-xs border rounded px-2 py-1"
-                          >
-                            {STATUSES.map((s) => (
-                              <option key={s}>{s}</option>
-                            ))}
-                          </select>
-                        </div>
-                      ))}
+                          ×
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
+
+                  <div className="flex gap-3 flex-wrap">
+                    <input
+                      className="bg-white/5 px-3 py-2 rounded-lg text-sm"
+                      placeholder="Name"
+                      value={member}
+                      onChange={e => setMember(e.target.value)}
+                    />
+                    <select
+                      className="bg-white/5 px-3 py-2 rounded-lg text-sm"
+                      value={role}
+                      onChange={e => setRole(e.target.value)}
+                    >
+                      {ROLES.map(r => (
+                        <option key={r}>{r}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={addMember}
+                      className="px-4 py-2 rounded-lg bg-white text-black text-sm"
+                    >
+                      Add Member
+                    </button>
+                  </div>
+                </section>
+
+                {/* MILESTONES */}
+                <section>
+                  <p className="text-sm text-white/40 mb-4">Milestones</p>
+
+                  <div className="space-y-3 mb-4">
+                    {activeProject.milestones.map(m => (
+                      <div
+                        key={m.id}
+                        className="flex justify-between items-center bg-white/5 px-4 py-3 rounded-lg"
+                      >
+                        <span>{m.title}</span>
+                        <button
+                          onClick={() => removeMilestone(m.id)}
+                          className="text-xs text-red-400 hover:text-red-300"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-3">
+                    <input
+                      className="bg-white/5 px-3 py-2 rounded-lg text-sm"
+                      placeholder="New milestone"
+                      value={milestone}
+                      onChange={e => setMilestone(e.target.value)}
+                    />
+                    <button
+                      onClick={addMilestone}
+                      className="px-4 py-2 rounded-lg bg-white text-black text-sm"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </section>
+
               </div>
-            </>
-          )}
-        </main>
+            )}
+          </main>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

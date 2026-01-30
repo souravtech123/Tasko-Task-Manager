@@ -4,74 +4,69 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="w-full bg-white/80 backdrop-blur-md shadow-xl sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between">
-
-        {/* Logo */}
-        <div className="flex items-center gap-2 cursor-pointer">
-          <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">
-            T
-          </div>
-          <span className="text-xl font-extrabold text-gray-800">
+    <header className="fixed top-0 left-0 w-full z-50">
+      {/* DESKTOP BAR */}
+      <div className="hidden md:block">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between text-white">
+          
+          {/* BRAND */}
+          <div className="text-lg font-medium tracking-tight">
             Tasko
-          </span>
+          </div>
+
+          {/* LINKS */}
+          <nav className="flex items-center gap-10 text-sm text-white/60">
+            <a href="#about" className="hover:text-white transition">
+              About
+            </a>
+            <a href="#features" className="hover:text-white transition">
+              Features
+            </a>
+            <a href="#projects" className="hover:text-white transition">
+              Projects
+            </a>
+          </nav>
+
+          {/* ACTION */}
+          <button className="px-5 py-2 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition">
+            Enter workspace
+          </button>
         </div>
+      </div>
 
-        {/* Desktop Menu */}
-        <ul className="hidden md:flex items-center gap-5 font-semibold text-gray-700">
-          {[
-            { name: "Home", emoji: "🏠" },
-            { name: "Projects", emoji: "📂" },
-            { name: "Tasks", emoji: "✅" },
-            { name: "Timeline", emoji: "⏳" },
-           
-          ].map((item) => (
-            <li
-              key={item.name}
-              className="flex items-center gap-1 cursor-pointer hover:text-indigo-600 transition"
-            >
-              <span>{item.emoji}</span>
-              {item.name}
-            </li>
-          ))}
-        </ul>
+      {/* MOBILE BAR */}
+      <div className="md:hidden backdrop-blur-md bg-black/40 border-b border-white/10">
+        <div className="px-4 h-14 flex items-center justify-between text-white">
+          
+          <span className="font-medium">Tasko</span>
 
-        {/* Right Actions */}
-        <div className="hidden md:flex items-center gap-3">
-          <button className="px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition">
-            👤 Profile
+          <button
+            onClick={() => setOpen(!open)}
+            className="text-white/80 text-sm"
+          >
+            {open ? "Close" : "Menu"}
           </button>
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden text-2xl"
-        >
-          😄
-        </button>
-      </div>
+        {/* MOBILE MENU */}
+        {open && (
+          <div className="px-4 pb-6 pt-4 space-y-4 text-sm text-white/70">
+            <a href="#about" className="block">
+              About
+            </a>
+            <a href="#features" className="block">
+              Features
+            </a>
+            <a href="#projects" className="block">
+              Projects
+            </a>
 
-      {/* Mobile Menu */}
-      {open && (
-        <div className="md:hidden bg-white px-5 pb-5 space-y-3">
-          {[
-            "🏠 Home",
-            "📂 Projects",
-            "✅ Tasks",
-            "⏳ Timeline",
-            "📤 Submit",
-            "👤 Profile",
-          ].map((item) => (
-            <p
-              key={item}
-              className="font-semibold text-gray-700 hover:text-indigo-600"
-            >
-              {item}
-            </p>
-          ))}
-        </div>
-      )}
-    </nav>
+            <button className="mt-4 w-full py-3 rounded-xl bg-white text-black font-medium">
+              Enter workspace
+            </button>
+          </div>
+        )}
+      </div>
+    </header>
   );
 }
