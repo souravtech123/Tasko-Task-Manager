@@ -1,3 +1,5 @@
+import { NavLink } from "react-router";
+
 export default function Hero() {
 
   const scrollToProjectSystem = () => {
@@ -41,12 +43,12 @@ export default function Hero() {
 
           {/* CTA */}
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <button
-              onClick={scrollToProjectSystem}
-              className="px-8 py-4 rounded-xl bg-white text-black font-medium hover:bg-white/90 transition"
-            >
-              Start a dev project
-            </button>
+          <NavLink
+  to="/project"
+  className="inline-block px-8 py-4 rounded-xl bg-white text-black font-medium hover:bg-white/90 transition"
+>
+  Start a dev project
+</NavLink>
 
             <button className="px-8 py-4 rounded-xl border border-white/20 text-white/80 hover:bg-white/5 transition">
               View workflow

@@ -1,16 +1,16 @@
 import React from 'react'
-import Navbar from './Components/Navbar'
-import Hero from './Components/Hero'
-import Home from './Components/Home'
-import About from './Components/About'
+import { Route, Routes } from 'react-router'
+import Home from './Pages/Home'
+import ProjectManage from './Pages/ProjectManage'
+
 
 const App = () => {
   return (
     <>
-    <Navbar/>
-    <Hero/>
-    <About/>
-    <Home/>
+    <Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/Project" element={<ProjectManage />} />
+    </Routes>
     </>
   )
 }
