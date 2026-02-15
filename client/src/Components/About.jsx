@@ -1,98 +1,157 @@
 export default function Features() {
   return (
-    <section className="min-h-screen w-full bg-[#08080e] text-white">
-      <div className="max-w-7xl mx-auto px-6 py-24">
-        
+    <section
+      id="features"
+      className="relative w-full bg-[#f8fafc] text-gray-900 overflow-hidden"
+    >
+      <div className="max-w-7xl mx-auto px-6 py-28">
+
         {/* HEADER */}
-        <div className="mb-20 max-w-2xl">
-          <p className="text-sm text-white/40 mb-4 tracking-wide">
-            What you can do
+        <div className="max-w-2xl mb-20">
+          <p className="text-sm text-gray-500 mb-4 tracking-wide">
+            Core features
           </p>
 
           <h2 className="text-3xl sm:text-4xl font-semibold leading-tight">
-            Everything you need —
+            Three features.
             <br />
-            nothing you don’t.
+            <span className="text-gray-500">
+              Done exceptionally well.
+            </span>
           </h2>
         </div>
 
-        {/* FEATURES GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
-          
-          {/* FEATURE */}
-          <div>
-            <h3 className="text-lg font-medium mb-3">
-              Project overview
+        {/* FEATURE CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+          {/* CARD 1 */}
+          <div className="feature-pro group">
+            <div className="icon-wrap bg-blue-100 text-blue-600">
+              💡
+            </div>
+
+            <h3 className="title">
+              Project Idea Generator
             </h3>
-            <p className="text-white/60 leading-relaxed">
-              See your entire project at a glance.
-              Progress, structure, and direction —
-              without digging through layers.
+
+            <p className="desc">
+              Generate practical, real-world project ideas tailored for
+              students, developers, and startup builders.
             </p>
+
+            <span className="cta">
+              Try idea generator →
+            </span>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-3">
-              Team clarity
+          {/* CARD 2 */}
+          <div className="feature-pro group">
+            <div className="icon-wrap bg-indigo-100 text-indigo-600">
+              📋
+            </div>
+
+            <h3 className="title">
+              Task & Sprint Management
             </h3>
-            <p className="text-white/60 leading-relaxed">
-              Know who’s involved and why.
-              Roles stay visible, collaboration stays simple.
+
+            <p className="desc">
+              Break ideas into actionable tasks.
+              Plan sprints, track progress, and stay focused without pressure.
             </p>
+
+            <span className="cta">
+              Organize work →
+            </span>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-3">
-              Calm progress tracking
-            </h3>
-            <p className="text-white/60 leading-relaxed">
-              Progress is shown, not enforced.
-              No pressure, no alarms — just awareness.
-            </p>
-          </div>
+          {/* CARD 3 */}
+          <div className="feature-pro group">
+            <div className="icon-wrap bg-emerald-100 text-emerald-600">
+              ⭐
+            </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-3">
-              Mobile-first by design
+            <h3 className="title">
+              Team Performance Insights
             </h3>
-            <p className="text-white/60 leading-relaxed">
-              Built for phones first.
-              Desktop expands naturally —
-              nothing breaks, nothing stretches.
-            </p>
-          </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-3">
-              Visual focus
-            </h3>
-            <p className="text-white/60 leading-relaxed">
-              Fewer controls.
-              Clear surfaces.
-              Interfaces that stay out of the way.
+            <p className="desc">
+              Understand contribution, momentum, and delivery quality
+              with simple, calm performance signals.
             </p>
-          </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-3">
-              Flexible by default
-            </h3>
-            <p className="text-white/60 leading-relaxed">
-              No forced workflows.
-              Use Tasko the way your project actually works.
-            </p>
+            <span className="cta">
+              View insights →
+            </span>
           </div>
 
         </div>
 
         {/* FOOTNOTE */}
         <div className="mt-24 max-w-xl">
-          <p className="text-sm text-white/40">
-            Tasko is designed to support thinking —
-            not to replace it.
+          <p className="text-sm text-gray-400">
+            Tasko focuses on clarity over clutter —
+            fewer features, better execution.
           </p>
         </div>
       </div>
+
+      {/* STYLES */}
+      <style>{`
+        .feature-pro {
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 1.5rem;
+          padding: 2.4rem 2rem;
+          box-shadow: 0 10px 35px rgba(0,0,0,0.05);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          cursor: pointer;
+        }
+
+        .feature-pro:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 25px 60px rgba(0,0,0,0.08);
+        }
+
+        .icon-wrap {
+          width: 52px;
+          height: 52px;
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.4rem;
+          margin-bottom: 1.2rem;
+        }
+
+        .title {
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 0.6rem;
+          color: #111827;
+        }
+
+        .desc {
+          font-size: 0.95rem;
+          line-height: 1.6;
+          color: #6b7280;
+        }
+
+        .cta {
+          display: inline-block;
+          margin-top: 1.4rem;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #2563eb;
+          opacity: 0;
+          transform: translateY(4px);
+          transition: all 0.25s ease;
+        }
+
+        .feature-pro:hover .cta {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      `}</style>
     </section>
   );
 }

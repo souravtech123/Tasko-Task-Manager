@@ -2,7 +2,7 @@ import { NavLink } from "react-router";
 
 export default function Hero() {
 
-  const scrollToProjectSystem = () => {
+  const scrollToIdeaGenerator = () => {
     const target = document.getElementById("project-system");
     if (target) {
       target.scrollIntoView({ behavior: "smooth" });
@@ -10,81 +10,139 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden bg-[#05050b] text-white">
-      
-      {/* BACKGROUND GRADIENTS */}
-      <div className="absolute inset-0">
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-600/30 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-indigo-600/30 rounded-full blur-[120px]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black" />
+    <section className="relative min-h-screen w-full overflow-hidden bg-[#f8fafc] text-gray-900">
+
+      {/* PREMIUM BACKGROUND */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-40 -left-40 w-[520px] h-[520px] bg-blue-300/30 rounded-full blur-[140px]" />
+        <div className="absolute -bottom-40 -right-40 w-[520px] h-[520px] bg-indigo-300/30 rounded-full blur-[140px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-[#f8fafc]" />
       </div>
 
       {/* CONTENT */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 flex flex-col lg:flex-row items-center justify-between gap-16">
-        
-        {/* LEFT TEXT */}
-        <div className="flex-1 text-center lg:text-left">
-          
-          <p className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full border border-white/15 text-sm text-white/70">
-            ⚙️ Built for Development Teams
-          </p>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-28 flex flex-col lg:flex-row items-center gap-24">
 
+        {/* LEFT */}
+        <div className="flex-1 text-center lg:text-left">
+
+          {/* VERSION BADGE */}
+          <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full bg-white border border-gray-200 shadow-sm text-sm text-gray-600">
+            ✨ Tasko v3 · AI-powered workspace
+          </div>
+
+          {/* HEADING */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight">
-            Ship projects faster. <br />
-            <span className="text-white/70">
-              Without burnout or chaos.
+            Turn ideas into
+            <br />
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              real software projects
             </span>
           </h1>
 
-          <p className="mt-6 max-w-xl text-base sm:text-lg text-white/60 mx-auto lg:mx-0">
-            Tasko helps developers plan sprints, track tasks, and deliver
-            real-world software projects with clarity, structure, and flow.
+          {/* SUBTEXT */}
+          <p className="mt-6 max-w-xl text-base sm:text-lg text-gray-600 mx-auto lg:mx-0">
+            Start working instantly or generate powerful project ideas with AI.
+            Tasko v3 gives developers everything they need — from idea to execution.
           </p>
 
-          {/* CTA */}
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-          <NavLink
-  to="/project"
-  className="inline-block px-8 py-4 rounded-xl bg-white text-black font-medium hover:bg-white/90 transition"
->
-  Start a dev project
-</NavLink>
-
-            <button className="px-8 py-4 rounded-xl border border-white/20 text-white/80 hover:bg-white/5 transition">
-              View workflow
-            </button>
+          {/* FEATURES */}
+          <div className="mt-6 flex flex-wrap gap-3 justify-center lg:justify-start">
+            <span className="chip">💡 Idea Generator</span>
+            <span className="chip">📋 Task & Sprint Planning</span>
+            <span className="chip">⭐ Performance Tracking</span>
           </div>
 
-          <p className="mt-6 text-xs text-white/40">
-            Designed for web, app & software development teams
+          {/* CTA BUTTONS */}
+          <div className="mt-12 flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
+
+            {/* PRIMARY */}
+            <NavLink
+              to="/project"
+              className="inline-flex items-center justify-center px-9 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium shadow-xl hover:shadow-2xl hover:scale-[1.03] transition"
+            >
+              🚀 Start Work
+            </NavLink>
+
+            {/* SECONDARY */}
+            <NavLink
+              to={'/idea'}
+              className="inline-flex items-center justify-center px-9 py-4 rounded-2xl bg-white border border-gray-300 text-gray-800 font-medium shadow-sm hover:bg-gray-50 hover:scale-[1.02] transition"
+            >
+              💡 Generate Idea
+            </NavLink>
+
+          </div>
+
+          <p className="mt-6 text-xs text-gray-400">
+            Trusted by students, developers & early-stage teams
           </p>
         </div>
 
         {/* RIGHT VISUAL */}
         <div className="flex-1 relative w-full max-w-md lg:max-w-lg">
-          <div className="relative rounded-[28px] border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-2xl">
-            
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-sm text-white/70">
-                Tasko · Sprint Board
+
+          <div className="relative rounded-[30px] border border-gray-200 bg-white shadow-2xl p-6">
+
+            {/* CARD HEADER */}
+            <div className="flex items-center justify-between mb-5">
+              <span className="text-sm font-semibold text-gray-800">
+                Project Idea Generator
               </span>
-              <span className="text-xs text-emerald-400">
-                ● Active Sprint
+              <span className="text-xs font-medium text-indigo-600">
+                ● Premium AI
               </span>
             </div>
 
+            {/* IDEA CARDS */}
             <div className="space-y-4">
-              <div className="h-10 rounded-xl bg-gradient-to-r from-indigo-500/40 to-purple-500/40" />
-              <div className="h-10 rounded-xl bg-white/10" />
-              <div className="h-10 rounded-xl bg-white/10" />
-              <div className="h-10 rounded-xl bg-white/10" />
+              <div className="idea-card active">
+                <p className="text-sm font-medium">
+                  🚀 AI Resume Analyzer
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Resume scoring, job matching & ATS insights
+                </p>
+              </div>
+
+              <div className="idea-card">
+                📊 College Project Management System
+              </div>
+
+              <div className="idea-card">
+                🧠 Smart Learning Planner with AI
+              </div>
             </div>
           </div>
 
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/30 rounded-full blur-[80px]" />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-500/30 rounded-full blur-[80px]" />
+          {/* GLOWS */}
+          <div className="absolute -top-12 -right-12 w-36 h-36 bg-blue-300/40 rounded-full blur-[90px]" />
+          <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-indigo-300/40 rounded-full blur-[90px]" />
         </div>
       </div>
+
+      {/* STYLES */}
+      <style>{`
+        .chip {
+          padding: 0.45rem 1rem;
+          border-radius: 999px;
+          background: white;
+          border: 1px solid #e5e7eb;
+          font-size: 0.85rem;
+          color: #4b5563;
+        }
+        .idea-card {
+          padding: 0.9rem 1rem;
+          border-radius: 0.9rem;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          font-size: 0.9rem;
+          color: #374151;
+        }
+        .idea-card.active {
+          background: linear-gradient(to right, #eef2ff, #f5f3ff);
+          border-color: #c7d2fe;
+        }
+      `}</style>
     </section>
   );
 }

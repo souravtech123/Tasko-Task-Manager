@@ -1,79 +1,107 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 /* -------------------- Storage Helpers -------------------- */
-const getData = (key) => JSON.parse(localStorage.getItem(key)) || [];
-const setData = (key, value) =>
+const getData = (key) => {
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : [];
+};
+
+const setData = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
+};
 
 export default function ProjectManage() {
-  const [projects, setProjects] = useState(getData("projects"));
-  const [members, setMembers] = useState(getData("members"));
-  const [tasks, setTasks] = useState(getData("tasks"));
+  /* -------------------- Core State -------------------- */
+  const [projects, setProjects] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
-  const [activeProjectId, setActiveProjectId] = useState(
-    projects[0]?.id || null
-  );
+  const [activeProjectId, setActiveProjectId] = useState(null);
 
-  /* Project */
+  const [showPremium, setShowPremium] = useState(false);
+
+  /* -------------------- Project Form -------------------- */
   const [projectName, setProjectName] = useState("");
   const [projectDesc, setProjectDesc] = useState("");
   const [projectDeadline, setProjectDeadline] = useState("");
 
-  /* Member */
+  /* -------------------- Member Form -------------------- */
   const [memberName, setMemberName] = useState("");
   const [memberRole, setMemberRole] = useState("");
   const [editingMemberId, setEditingMemberId] = useState(null);
 
-  /* Task */
+  /* -------------------- Task Form -------------------- */
   const [taskTitle, setTaskTitle] = useState("");
   const [taskMember, setTaskMember] = useState("");
   const [taskDeadline, setTaskDeadline] = useState("");
 
-  const activeProject = projects.find(p => p.id === activeProjectId);
+  /* -------------------- Load from localStorage -------------------- */
+  useEffect(() => {
+    setProjects(getData("projects"));
+    setMembers(getData("members"));
+    setTasks(getData("tasks"));
+  }, []);
 
-  /* -------------------- Effects -------------------- */
+  /* -------------------- Save to localStorage -------------------- */
   useEffect(() => setData("projects", projects), [projects]);
   useEffect(() => setData("members", members), [members]);
   useEffect(() => setData("tasks", tasks), [tasks]);
 
-  /* -------------------- Project -------------------- */
-  const createProject = () => {
-    if (!projectName || !projectDeadline) return;
+  /* -------------------- Restore Active Project -------------------- */
+  useEffect(() => {
+    if (projects.length > 0 && !activeProjectId) {
+      setActiveProjectId(projects[0].id);
+    }
+  }, [projects, activeProjectId]);
 
-    const id = Date.now().toString();
-    setProjects([
-      ...projects,
+  const activeProject = projects.find(p => p.id === activeProjectId);
+
+  /* -------------------- Project Logic -------------------- */
+  const createProject = () => {
+    if (!projectName || !projectDeadline) {
+      alert("Project name and deadline required");
+      return;
+    }
+
+    const id = crypto.randomUUID();
+
+    setProjects(prev => [
+      ...prev,
       { id, name: projectName, description: projectDesc, deadline: projectDeadline }
     ]);
-    setActiveProjectId(id);
 
+    setActiveProjectId(id);
     setProjectName("");
     setProjectDesc("");
     setProjectDeadline("");
   };
 
+  const deleteProject = (id) => {
+    if (!window.confirm("Delete this project?")) return;
+    setProjects(prev => prev.filter(p => p.id !== id));
+    setMembers(prev => prev.filter(m => m.projectId !== id));
+    setTasks(prev => prev.filter(t => t.projectId !== id));
+    setActiveProjectId(null);
+  };
+
   /* -------------------- Members -------------------- */
-  const projectMembers = members.filter(
-    m => m.projectId === activeProjectId
-  );
+  const projectMembers = members.filter(m => m.projectId === activeProjectId);
 
   const saveMember = () => {
     if (!memberName || !memberRole || !activeProject) return;
 
     if (editingMemberId) {
-      setMembers(
-        members.map(m =>
-          m.id === editingMemberId
-            ? { ...m, name: memberName, role: memberRole }
-            : m
+      setMembers(prev =>
+        prev.map(m =>
+          m.id === editingMemberId ? { ...m, name: memberName, role: memberRole } : m
         )
       );
       setEditingMemberId(null);
     } else {
-      setMembers([
-        ...members,
+      setMembers(prev => [
+        ...prev,
         {
-          id: Date.now().toString(),
+          id: crypto.randomUUID(),
           projectId: activeProject.id,
           name: memberName,
           role: memberRole,
@@ -87,30 +115,16 @@ export default function ProjectManage() {
     setMemberRole("");
   };
 
-  const editMember = (m) => {
-    setEditingMemberId(m.id);
-    setMemberName(m.name);
-    setMemberRole(m.role);
-  };
-
-  const deleteMember = (id) => {
-    if (!window.confirm("Delete this member?")) return;
-    setMembers(members.filter(m => m.id !== id));
-    setTasks(tasks.filter(t => t.assignedTo !== id));
-  };
-
   /* -------------------- Tasks -------------------- */
-  const projectTasks = tasks.filter(
-    t => t.projectId === activeProjectId
-  );
+  const projectTasks = tasks.filter(t => t.projectId === activeProjectId);
 
   const createTask = () => {
-    if (!taskTitle || !taskMember || !taskDeadline) return;
+    if (!taskTitle || !taskMember || !taskDeadline || !activeProject) return;
 
-    setTasks([
-      ...tasks,
+    setTasks(prev => [
+      ...prev,
       {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         projectId: activeProject.id,
         title: taskTitle,
         assignedTo: taskMember,
@@ -125,202 +139,111 @@ export default function ProjectManage() {
   };
 
   const updateTask = (id, status) => {
-    const task = tasks.find(t => t.id === id);
-
-    setTasks(
-      tasks.map(t =>
-        t.id === id ? { ...t, status } : t
-      )
+    setTasks(prev =>
+      prev.map(t => (t.id === id ? { ...t, status } : t))
     );
-
-    if (status === "Done") {
-      const onTime = new Date() <= new Date(task.deadline);
-
-      setMembers(
-        members.map(m =>
-          m.id === task.assignedTo
-            ? {
-                ...m,
-                completed: m.completed + 1,
-                stars: onTime ? m.stars + 1 : m.stars
-              }
-            : m
-        )
-      );
-    }
-  };
-
-  const deleteTask = (id) => {
-    if (!window.confirm("Delete this task?")) return;
-    setTasks(tasks.filter(t => t.id !== id));
   };
 
   /* -------------------- UI -------------------- */
   return (
-    <div className="min-h-screen bg-[#0f172a] text-gray-100 px-4 py-8">
-      <div className="max-w-6xl mx-auto space-y-10">
+    <div className="min-h-screen bg-[#f8fafc] px-6 py-10">
+      <div className="max-w-7xl mx-auto space-y-10">
 
         {/* Header */}
-        <header>
-          <h1 className="text-3xl font-semibold">Tasko</h1>
-          <p className="text-gray-400 mt-1">
-            Clean & focused project management
-          </p>
+        <header className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-semibold">
+              Tasko <span className="text-blue-600">Pro</span>
+            </h1>
+            <p className="text-gray-500">Simple project management</p>
+          </div>
+
+          <button
+            onClick={() => setShowPremium(true)}
+            className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+          >
+            View Pro Features
+          </button>
         </header>
 
         {/* Create Project */}
-        <section className="bg-[#111827] rounded-xl p-6 space-y-4">
-          <h2 className="text-lg font-medium">Create Project</h2>
+        <section className="card">
+          <h2 className="section-title">Create Project</h2>
 
           <div className="grid md:grid-cols-3 gap-4">
-            <input className="input" placeholder="Project name" value={projectName} onChange={e => setProjectName(e.target.value)} />
-            <input className="input" placeholder="Description" value={projectDesc} onChange={e => setProjectDesc(e.target.value)} />
-            <input type="date" className="input" value={projectDeadline} onChange={e => setProjectDeadline(e.target.value)} />
+            <input className="input" placeholder="Project name"
+              value={projectName} onChange={e => setProjectName(e.target.value)} />
+            <input className="input" placeholder="Description"
+              value={projectDesc} onChange={e => setProjectDesc(e.target.value)} />
+            <input type="date" className="input"
+              value={projectDeadline} onChange={e => setProjectDeadline(e.target.value)} />
           </div>
 
-          <button onClick={createProject} className="btn-primary">
+          <button onClick={createProject} className="btn-primary mt-4">
             Create Project
           </button>
         </section>
 
-        {activeProject && (
-          <div className="grid md:grid-cols-2 gap-8">
+        {/* Projects */}
+        {projects.map(p => (
+          <div key={p.id} className="project-card" onClick={() => setActiveProjectId(p.id)}>
+            <div>
+              <h3>{p.name}</h3>
+              <p className="text-sm text-gray-500">{p.description}</p>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); deleteProject(p.id); }}
+              className="text-red-500"
+            >
+              Delete
+            </button>
+          </div>
+        ))}
 
-            {/* Members */}
-            <section className="bg-[#111827] rounded-xl p-6 space-y-5">
-              <h2 className="text-lg font-medium">Team Members</h2>
+        {/* PREMIUM MODAL */}
+        {showPremium && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+              <h2 className="text-2xl font-semibold">Tasko Pro</h2>
+              <p className="text-gray-500 mt-2">
+                Advanced features are on the way 🚀
+              </p>
 
-              <div className="space-y-3">
-                <input className="input" placeholder="Member name" value={memberName} onChange={e => setMemberName(e.target.value)} />
-                <input className="input" placeholder="Role (Lead / Dev / QA)" value={memberRole} onChange={e => setMemberRole(e.target.value)} />
+              <ul className="mt-4 text-sm space-y-2">
+                <li>✔ Unlimited Projects</li>
+                <li>✔ Analytics Dashboard</li>
+                <li>✔ Team Performance</li>
+                <li>✔ Priority Support</li>
+              </ul>
 
-                <button onClick={saveMember} className="btn-secondary">
-                  {editingMemberId ? "Update Member" : "Add Member"}
+              <div className="mt-6 space-y-3">
+                <button
+                  disabled
+                  className="w-full bg-gray-200 text-gray-500 py-2 rounded-full cursor-not-allowed"
+                >
+                  Pro Version Coming Soon
+                </button>
+
+                <button
+                  onClick={() => setShowPremium(false)}
+                  className="btn-secondary w-full"
+                >
+                  Close
                 </button>
               </div>
-
-              <ul className="space-y-3">
-                {projectMembers.map(m => (
-                  <li key={m.id} className="row">
-                    <div>
-                      <p className="font-medium">{m.name}</p>
-                      <p className="text-sm text-gray-400">{m.role}</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm">⭐ {m.stars}</span>
-                      <button onClick={() => editMember(m)} className="link">
-                        Edit
-                      </button>
-                      <button onClick={() => deleteMember(m.id)} className="link text-red-400">
-                        Delete
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            {/* Tasks */}
-            <section className="bg-[#111827] rounded-xl p-6 space-y-5">
-              <h2 className="text-lg font-medium">Tasks</h2>
-
-              <div className="space-y-3">
-                <input className="input" placeholder="Task title" value={taskTitle} onChange={e => setTaskTitle(e.target.value)} />
-
-                <select className="input" value={taskMember} onChange={e => setTaskMember(e.target.value)}>
-                  <option value="">Assign to</option>
-                  {projectMembers.map(m => (
-                    <option key={m.id} value={m.id}>{m.name}</option>
-                  ))}
-                </select>
-
-                <input type="date" className="input" value={taskDeadline} onChange={e => setTaskDeadline(e.target.value)} />
-
-                <button onClick={createTask} className="btn-primary">
-                  Add Task
-                </button>
-              </div>
-
-              <ul className="space-y-3">
-                {projectTasks.map(t => (
-                  <li key={t.id} className="row">
-                    <div>
-                      <p className="font-medium">{t.title}</p>
-                      <p className="text-sm text-gray-400">
-                        Due {t.deadline}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <select
-                        className="input-sm"
-                        onChange={e => updateTask(t.id, e.target.value)}
-                      >
-                        <option>Backlog</option>
-                        <option>In Progress</option>
-                        <option>Review</option>
-                        <option>Done</option>
-                      </select>
-
-                      <button
-                        onClick={() => deleteTask(t.id)}
-                        className="link text-red-400"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
+            </div>
           </div>
         )}
       </div>
 
-      {/* Utility styles */}
+      {/* Styles */}
       <style>{`
-        .input {
-          width: 100%;
-          background: #020617;
-          border: 1px solid #1f2933;
-          padding: 0.75rem;
-          border-radius: 0.5rem;
-        }
-        .input-sm {
-          background: #020617;
-          border: 1px solid #1f2933;
-          padding: 0.4rem;
-          border-radius: 0.4rem;
-          font-size: 0.85rem;
-        }
-        .btn-primary {
-          background: #2563eb;
-          padding: 0.7rem 1.4rem;
-          border-radius: 0.5rem;
-          font-weight: 500;
-        }
-        .btn-secondary {
-          background: #1f2933;
-          padding: 0.7rem;
-          border-radius: 0.5rem;
-          font-weight: 500;
-        }
-        .row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: #020617;
-          padding: 0.75rem 1rem;
-          border-radius: 0.6rem;
-        }
-        .link {
-          font-size: 0.85rem;
-          color: #93c5fd;
-        }
-        .link:hover {
-          text-decoration: underline;
-        }
+        .card { background:white; padding:1.5rem; border-radius:1rem }
+        .section-title { font-weight:600; margin-bottom:1rem }
+        .input { width:100%; padding:0.6rem; border:1px solid #e5e7eb; border-radius:0.5rem }
+        .btn-primary { background:#2563eb; color:white; padding:0.6rem 1.2rem; border-radius:999px }
+        .btn-secondary { background:#f1f5f9; padding:0.6rem 1.2rem; border-radius:999px }
+        .project-card { background:white; padding:1rem; border-radius:1rem; display:flex; justify-content:space-between; margin-top:0.5rem; cursor:pointer }
       `}</style>
     </div>
   );
