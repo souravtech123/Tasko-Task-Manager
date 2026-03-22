@@ -3,16 +3,12 @@
  * Displays logged-in user info, protected route
  */
 import { Link, useNavigate } from 'react-router';
-import { useAuth } from '../context/AuthContext';
-import { logout as logoutApi } from '../api/auth';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const user = { name: "Guest", email: "guest@tasko.local" };
 
-  const handleLogout = async () => {
-    await logoutApi();
-    logout();
+  const handleLogout = () => {
     navigate('/');
   };
 

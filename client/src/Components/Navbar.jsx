@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { useAuth } from "../context/AuthContext";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -11,7 +10,6 @@ const navLinks = [
 ];
 
 export default function TaskoNavbar() {
-  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -121,7 +119,6 @@ export default function TaskoNavbar() {
             {/* ACTION BUTTONS */}
             <div className="hidden md:flex items-center gap-3">
 
-              {user ? (
                 <>
                   <Link
                     to="/dashboard"
@@ -137,23 +134,6 @@ export default function TaskoNavbar() {
                     Projects
                   </Link>
                 </>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    className="text-sm text-zinc-400 hover:text-white transition"
-                  >
-                    Log in
-                  </Link>
-
-                  <Link
-                    to="/register"
-                    className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-cyan-500 hover:scale-105 transition shadow-lg"
-                  >
-                    Get Started
-                  </Link>
-                </>
-              )}
 
             </div>
 
@@ -192,7 +172,6 @@ export default function TaskoNavbar() {
 
                 <div className="border-t border-white/10 px-4 py-4 space-y-3">
 
-                  {user ? (
                     <>
                       <Link
                         to="/dashboard"
@@ -208,23 +187,6 @@ export default function TaskoNavbar() {
                         Projects
                       </Link>
                     </>
-                  ) : (
-                    <>
-                      <Link
-                        to="/login"
-                        className="block text-center py-2.5 rounded-xl text-sm text-zinc-300 border border-white/10"
-                      >
-                        Log in
-                      </Link>
-
-                      <Link
-                        to="/register"
-                        className="block text-center py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-cyan-500"
-                      >
-                        Get Started
-                      </Link>
-                    </>
-                  )}
 
                 </div>
 

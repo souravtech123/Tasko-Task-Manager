@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
-import { logout as logoutApi } from "../api/auth";
 
 /* ─── Storage Helpers (using in-memory state, no localStorage) ─── */
 let _store = { startups: [], goals: [], tasks: [], notes: [] };
@@ -124,11 +122,9 @@ const SectionHeader = ({ icon, title, count, action }) => (
 ════════════════════════════════════════════════════ */
 export default function StartupManager() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const user = { name: "Guest" };
 
-  const handleLogout = async () => {
-    await logoutApi();
-    logout();
+  const handleLogout = () => {
     navigate("/");
   };
 

@@ -135,7 +135,7 @@ export default function TaskoHero() {
           <div className="flex gap-4">
 
             <Link
-              to="/register"
+              to="/project"
               className="px-8 py-4 rounded-xl text-base font-semibold text-white bg-gradient-to-r from-violet-600 to-cyan-500 hover:scale-105 transition shadow-lg"
             >
               Start for free
