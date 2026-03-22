@@ -1,148 +1,191 @@
-import { NavLink } from "react-router";
+import { useState, useEffect } from "react";
+import { Link } from "react-router";
 
-export default function Hero() {
+const floatingCards = [
+  {
+    id: 1,
+    title: "Product Launch",
+    tag: "Design",
+    tagColor: "bg-violet-500/20 text-violet-300",
+    progress: 72,
+    avatars: ["A", "K", "M"],
+    due: "Mar 12",
+    accent: "border-violet-500/30",
+  },
+  {
+    id: 2,
+    title: "API Integration",
+    tag: "Dev",
+    tagColor: "bg-cyan-500/20 text-cyan-300",
+    progress: 45,
+    avatars: ["J", "R"],
+    due: "Mar 18",
+    accent: "border-cyan-500/30",
+  },
+  {
+    id: 3,
+    title: "Go-to-Market",
+    tag: "Strategy",
+    tagColor: "bg-amber-500/20 text-amber-300",
+    progress: 88,
+    avatars: ["S", "L", "P", "D"],
+    due: "Mar 9",
+    accent: "border-amber-500/30",
+  },
+];
 
-  const scrollToIdeaGenerator = () => {
-    const target = document.getElementById("project-system");
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+const statItems = [
+  { value: "12k+", label: "Startups" },
+  { value: "98%", label: "On-time delivery" },
+  { value: "4.9★", label: "Rating" },
+];
+
+function ProjectCard({ card, style }) {
+  return (
+    <div
+      className={`absolute backdrop-blur-xl bg-white/5 border ${card.accent} rounded-2xl p-4 w-56 shadow-2xl`}
+      style={style}
+    >
+      <div className="flex justify-between mb-2">
+        <span className={`text-[11px] px-2 py-0.5 rounded-full ${card.tagColor}`}>
+          {card.tag}
+        </span>
+        <span className="text-[11px] text-zinc-500">{card.due}</span>
+      </div>
+
+      <p className="text-[13px] font-semibold text-white mb-2">
+        {card.title}
+      </p>
+
+      <div className="mb-2">
+        <div className="flex justify-between text-[11px] text-zinc-400 mb-1">
+          <span>Progress</span>
+          <span>{card.progress}%</span>
+        </div>
+
+        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-violet-500 to-cyan-400"
+            style={{ width: `${card.progress}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="flex">
+        {card.avatars.map((a, i) => (
+          <div
+            key={i}
+            className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-white text-[10px] font-bold border border-white/10"
+            style={{ marginLeft: i > 0 ? "-4px" : 0 }}
+          >
+            {a}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function TaskoHero() {
+  const [activeWord, setActiveWord] = useState(0);
+
+  const words = ["Launch", "Build", "Scale", "Ship"];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveWord((prev) => (prev + 1) % words.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden bg-[#f8fafc] text-gray-900">
+    <section className="relative min-h-screen bg-[#080810] flex items-center overflow-hidden">
 
-      {/* PREMIUM BACKGROUND */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-[520px] h-[520px] bg-blue-300/30 rounded-full blur-[140px]" />
-        <div className="absolute -bottom-40 -right-40 w-[520px] h-[520px] bg-indigo-300/30 rounded-full blur-[140px]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-[#f8fafc]" />
-      </div>
+      {/* Glow background */}
+      <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[120px]" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px]" />
 
-      {/* CONTENT */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-28 flex flex-col lg:flex-row items-center gap-24">
+      <div className="max-w-7xl mx-auto w-full px-6 lg:px-12 grid lg:grid-cols-2 gap-16 items-center">
 
-        {/* LEFT */}
-        <div className="flex-1 text-center lg:text-left">
+        {/* LEFT CONTENT */}
+        <div className="flex flex-col gap-6">
 
-          {/* VERSION BADGE */}
-          <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full bg-white border border-gray-200 shadow-sm text-sm text-gray-600">
-            ✨ Tasko v3 · AI-powered workspace
+          {/* Badge */}
+          <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-full text-[11px] text-zinc-300 w-fit">
+            Version 4 — Free to start
           </div>
 
-          {/* HEADING */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight">
-            Turn ideas into
+          {/* Heading */}
+          <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight">
+            The OS to
             <br />
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              real software projects
-            </span>
+            <span className="text-violet-400">{words[activeWord]}</span>
+            <br />
+            <span className="text-zinc-500">Your Startup.</span>
           </h1>
 
-          {/* SUBTEXT */}
-          <p className="mt-6 max-w-xl text-base sm:text-lg text-gray-600 mx-auto lg:mx-0">
-            Start working instantly or generate powerful project ideas with AI.
-            Tasko v3 gives developers everything they need — from idea to execution.
+          {/* Description */}
+          <p className="text-base text-zinc-400 max-w-md">
+            Tasko brings your entire startup workflow into one place —
+            sprints, roadmaps, team collaboration, and milestones.
           </p>
 
-          {/* FEATURES */}
-          <div className="mt-6 flex flex-wrap gap-3 justify-center lg:justify-start">
-            <span className="chip">💡 Idea Generator</span>
-            <span className="chip">📋 Task & Sprint Planning</span>
-            <span className="chip">⭐ Performance Tracking</span>
-          </div>
+          {/* Medium Buttons */}
+          <div className="flex gap-4">
 
-          {/* CTA BUTTONS */}
-          <div className="mt-12 flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
-
-            {/* PRIMARY */}
-            <NavLink
-              to="/project"
-              className="inline-flex items-center justify-center px-9 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium shadow-xl hover:shadow-2xl hover:scale-[1.03] transition"
+            <Link
+              to="/register"
+              className="px-8 py-4 rounded-xl text-base font-semibold text-white bg-gradient-to-r from-violet-600 to-cyan-500 hover:scale-105 transition shadow-lg"
             >
-              🚀 Start Work
-            </NavLink>
+              Start for free
+            </Link>
 
-            {/* SECONDARY */}
-            <NavLink
-              to={'/idea'}
-              className="inline-flex items-center justify-center px-9 py-4 rounded-2xl bg-white border border-gray-300 text-gray-800 font-medium shadow-sm hover:bg-gray-50 hover:scale-[1.02] transition"
+            <a
+              href="#features"
+              className="px-8 py-4 rounded-xl text-base font-semibold text-zinc-300 border border-white/10 hover:bg-white/10 transition"
             >
-              💡 Generate Idea
-            </NavLink>
+              Watch demo
+            </a>
 
           </div>
 
-          <p className="mt-6 text-xs text-gray-400">
-            Trusted by students, developers & early-stage teams
-          </p>
+          {/* Stats */}
+          <div className="flex gap-8 pt-4 border-t border-white/10">
+
+            {statItems.map((s, i) => (
+              <div key={i}>
+                <div className="text-xl font-bold text-white">{s.value}</div>
+                <div className="text-[11px] text-zinc-500">{s.label}</div>
+              </div>
+            ))}
+
+          </div>
+
         </div>
 
-        {/* RIGHT VISUAL */}
-        <div className="flex-1 relative w-full max-w-md lg:max-w-lg">
+        {/* RIGHT SIDE FLOATING CARDS */}
+        <div className="relative hidden lg:block h-[500px]">
 
-          <div className="relative rounded-[30px] border border-gray-200 bg-white shadow-2xl p-6">
+          <ProjectCard
+            card={floatingCards[0]}
+            style={{ top: "0%", right: "0%" }}
+          />
 
-            {/* CARD HEADER */}
-            <div className="flex items-center justify-between mb-5">
-              <span className="text-sm font-semibold text-gray-800">
-                Project Idea Generator
-              </span>
-              <span className="text-xs font-medium text-indigo-600">
-                ● Premium AI
-              </span>
-            </div>
+          <ProjectCard
+            card={floatingCards[1]}
+            style={{ bottom: "10%", right: "-10%" }}
+          />
 
-            {/* IDEA CARDS */}
-            <div className="space-y-4">
-              <div className="idea-card active">
-                <p className="text-sm font-medium">
-                  🚀 AI Resume Analyzer
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Resume scoring, job matching & ATS insights
-                </p>
-              </div>
+          <ProjectCard
+            card={floatingCards[2]}
+            style={{ bottom: "20%", left: "-10%" }}
+          />
 
-              <div className="idea-card">
-                📊 College Project Management System
-              </div>
-
-              <div className="idea-card">
-                🧠 Smart Learning Planner with AI
-              </div>
-            </div>
-          </div>
-
-          {/* GLOWS */}
-          <div className="absolute -top-12 -right-12 w-36 h-36 bg-blue-300/40 rounded-full blur-[90px]" />
-          <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-indigo-300/40 rounded-full blur-[90px]" />
         </div>
+
       </div>
 
-      {/* STYLES */}
-      <style>{`
-        .chip {
-          padding: 0.45rem 1rem;
-          border-radius: 999px;
-          background: white;
-          border: 1px solid #e5e7eb;
-          font-size: 0.85rem;
-          color: #4b5563;
-        }
-        .idea-card {
-          padding: 0.9rem 1rem;
-          border-radius: 0.9rem;
-          background: #f9fafb;
-          border: 1px solid #e5e7eb;
-          font-size: 0.9rem;
-          color: #374151;
-        }
-        .idea-card.active {
-          background: linear-gradient(to right, #eef2ff, #f5f3ff);
-          border-color: #c7d2fe;
-        }
-      `}</style>
     </section>
   );
 }
