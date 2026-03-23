@@ -426,7 +426,7 @@ export default function Home() {
               Log in
             </Link>
             <Link
-              to="/app"
+              to="/project"
               className="cta-btn-primary text-white text-sm font-bold px-4 py-2 rounded-lg flex items-center gap-1.5"
             >
               Get started free {Icons.arrow}
